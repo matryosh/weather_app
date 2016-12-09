@@ -10,6 +10,9 @@ class AddLocationForm(BoxLayout):
 
     def search_location(self):
 
+        if self.search_input.text == "":
+            return
+
         appidkey = "978031dbd4ea52dc90c8dfc5502d536b"
         search_template = "http://api.openweathermap.org/data/2.5/find?q={}&type=like&APPID="+ appidkey
         search_url = search_template.format(self.search_input.text)
