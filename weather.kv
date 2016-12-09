@@ -4,6 +4,9 @@ AddLocationForm:
     orientation: "vertical"
     search_input: search_box
     search_results: search_results_list
+    lat: latitude
+    long: longitude
+
     BoxLayout:
         height: "40dp"
         size_hint_y: None
@@ -17,6 +20,23 @@ AddLocationForm:
         Button:
             text: "Current Location"
             size_hint_x: 25
+            on_press: root.get_lat_get_long()
+
+    BoxLayout:
+        height: "30dp"
+        size_hint_y: None
+        Label:
+            text: "Latitude"
+            size_hint_x: 30
+        TextInput:
+            id: latitude
+            size_hint_x: 20
+        Label:
+            text: "Longitude"
+            size_hint_x: 30
+        TextInput:
+            id: longitude
+            size_hint_x: 20
     ListView:
         id: search_results_list
         item_strings: []
