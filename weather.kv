@@ -1,31 +1,10 @@
 #: import main main
 #: import ListAdapter kivy.adapters.listadapter.ListAdapter
+
 WeatherRoot:
 
 <WeatherRoot>:
     AddLocationForm
-
-<LocationButton>:
-    on_press: app.root.show_current_weather(self.text)
-
-<CurrentWeather@BoxLayout>:
-    location: ""
-    conditions: None
-    temp: None
-    temp_min: None
-    temp_max: None
-    orientation: "vertical"
-    Label:
-        text: root.location
-    BoxLayout:
-        orientation: "horizontal"
-        size_hint_y: None
-        height: "40dp"
-        Button:
-            text: "Add Location"
-            on_press: app.root.show_add_location_form()
-        Button:
-            text: "Forecast"
 
 <AddLocationForm>:
     orientation: "vertical"
@@ -38,6 +17,9 @@ WeatherRoot:
         TextInput:
             id: search_box
             size_hint_x: 50
+            focus: True
+            multiline: False
+            on_text_validate: root.search_location()
         Button:
             text: "Search"
             size_hint_x: 25
@@ -49,4 +31,51 @@ WeatherRoot:
     ListView:
         id: search_results_list
         adapter:
-            ListAdapter(data=[], cls=main.LocationButton)
+            ListAdapter(
+            data=[],
+            cls=main.LocationButton,
+            args_converter=root.args_converter)
+
+    Button:
+        text: "Cancel"
+        height: "40dp"
+        size_hint_y: None
+        on_press: app.root.show_current_weather(None)
+
+<CurrentWeather>:
+    orientation: "vertical"
+    BoxLayout:
+        Label:
+            text: "{} ({})".format(root.location[0], root.location[1])
+            font_size: "30dp"
+        Label:
+            text: "{}".format(root.temp)
+            font_size: "30dp"
+    Label:
+        text: root.conditions
+    Boxlayout:
+        orientation: "horizontal"
+        Label:
+            text: "Low: {}".format(root.temp_min)
+        Label:
+            text: "High: {}".format(root.temp_max)
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: None
+        height: "40dp"
+        Button:
+            text: "Add Location"
+            on_press: app.root.show_add_location_form()
+            background_normal: ''
+            background_color: 1, 0, 0, 1
+        Button:
+            text: "Forecast"
+
+
+
+<LocationButton>:
+    text: "{} ({})".format(self.location[0], self.location[1])
+    height: "40dp"
+    size_hint_y: None
+    on_press: app.root.show_current_weather(self.location)
+
