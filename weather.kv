@@ -10,7 +10,6 @@ WeatherRoot:
     orientation: "vertical"
     search_input: search_box
     search_results: search_results_list
-
     BoxLayout:
         height: "40dp"
         size_hint_y: None
@@ -27,7 +26,6 @@ WeatherRoot:
         Button:
             text: "Current Location"
             size_hint_x: 25
-
     ListView:
         id: search_results_list
         adapter:
@@ -53,7 +51,7 @@ WeatherRoot:
             font_size: "30dp"
     Label:
         text: root.conditions
-    Boxlayout:
+    BoxLayout:
         orientation: "horizontal"
         Label:
             text: "Low: {}".format(root.temp_min)
@@ -70,8 +68,6 @@ WeatherRoot:
             background_color: 1, 0, 0, 1
         Button:
             text: "Forecast"
-
-
 
 <LocationButton>:
     text: "{} ({})".format(self.location[0], self.location[1])

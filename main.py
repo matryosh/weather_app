@@ -3,11 +3,10 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty, ListProperty, NumericProperty, StringProperty
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.listview import ListItemButton
-from kivy.factory import Factory
 import json
 
 
-class LocationButton(ListProperty):
+class LocationButton(ListItemButton):
     location = ListProperty()
 
 class AddLocationForm(BoxLayout):
@@ -17,7 +16,7 @@ class AddLocationForm(BoxLayout):
 
 
     def search_location(self):
-
+        print "search_location"
         if self.search_input.text == "":
             return
 
@@ -55,7 +54,7 @@ class CurrentWeather(BoxLayout):
         request = UrlRequest(weather_url, self.weather_retrieved)
 
     def weather_retrieved(self, request, data):
-        data = json.loads(data.decode() if not isinstance(data, dict) else data)
+        data = json.loads(data.decode()) if not isinstance(data, dict) else data
         self.conditions = data['weather'][0]['description']
         self.temp = data['main']['temp']
         self.temp_min = data['main']['temp_min']
