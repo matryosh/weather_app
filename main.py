@@ -1,8 +1,12 @@
+import random
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
 from kivy.properties import ObjectProperty, ListProperty, NumericProperty, StringProperty
 from kivy.network.urlrequest import UrlRequest
 from kivy.uix.listview import ListItemButton
+from kivy.factory import Factory
+from kivy.graphics import Color, Ellipse
+from kivy.clock import Clock
 import json
 
 
@@ -42,7 +46,7 @@ class AddLocationForm(BoxLayout):
 
 class CurrentWeather(BoxLayout):
     location = ListProperty(['New York', 'US'])
-    conditions = StringProperty()
+    conditions = ObjectProperty()
     temp = NumericProperty()
     temp_min = NumericProperty()
     temp_max = NumericProperty()
@@ -55,11 +59,50 @@ class CurrentWeather(BoxLayout):
 
     def weather_retrieved(self, request, data):
         data = json.loads(data.decode()) if not isinstance(data, dict) else data
-        self.conditions = data['weather'][0]['description']
+        self.render_conditions(data['weather'][0]['description'])
         self.temp = data['main']['temp']
         self.temp_min = data['main']['temp_min']
         self.temp_max = data['main']['temp_max']
 
+    def render_conditions(self, conditions_description):
+        if "clear" in conditions_description.lower():
+            conditions_widget = Factory.ClearConditions()
+        elif "snow" in conditions_description.lower():
+            conditions_widget = SnowConditions()
+        else:
+            conditions_widget = Factory.UnknownConditions()
+        conditions_widget.conditions = conditions_description
+        self.conditions.clear_widgets()
+        self.conditions.add_widget(conditions_widget)
+
+class SnowConditions(Conditions):
+    FLAKE_SIZE = 5
+    NUM_FLAKES = 60
+    FLAKE_AREA = FLAKE_SIZE * NUM_FLAKES
+    FLAKE_INTERVAL = 1.0 / 30.0
+
+    def __init__(self, **kwargs):
+        super(SnowConditions, self).__init__(**kwargs)
+        self.flakes = [[x * self.FLAKE_SIZE, 0]
+                       for x in range(self.NUM_FLAKES)]
+        Clock.schedule_interval(self.update_flakes, self.FLAKE_INTERVAL)
+
+    def update_flakes(self, time):
+        for f in self.flakes:
+            f[0] += random.choice([-1, 1])
+            f[1] -= random.randint(0, self.FLAKE_SIZE)
+            if f[1] <= f[0]:
+                f[1] = random.randint(0, int(self.height))
+
+        self.canvas.before.clear()
+        with self.canvas.before:
+            widget_x = self.center_x - self.FLAKE_AREA / 2
+            widget_y = self.pos[1]
+            for x_flake, y_flake in self.flakes:
+                x = widget_x + x_flake
+                y = widget_y + y_flake
+                Color(0.9, 0.9, 1.0)
+                Ellipse(pos=(x, y), size = (self.FLAKE_SIZE, self.FLAKE_SIZE)
 class WeatherRoot(BoxLayout):
     current_weather = ObjectProperty()
 
