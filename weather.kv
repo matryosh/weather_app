@@ -49,8 +49,12 @@ WeatherRoot:
         Label:
             text: "{}".format(root.temp)
             font_size: "30dp"
-    Label:
-        text: root.conditions
+    BoxLayout:
+        orientation: "horizontal"
+        Label:
+            text: root.conditions
+        AsyvImage:
+            source: root.conditions_image
     BoxLayout:
         orientation: "horizontal"
         Label:
