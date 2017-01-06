@@ -32,7 +32,7 @@ WeatherRoot:
             ListAdapter(
             data=[],
             cls=main.LocationButton,
-            args_converter=root.args_converter)
+            args_converter=main.locations_args_converter)
 
     Button:
         text: "Cancel"
@@ -40,8 +40,28 @@ WeatherRoot:
         size_hint_y: None
         on_press: app.root.show_current_weather(None)
 
+<Locations@BoxLayout>:
+    orientation: "vertical"
+    locations_list: locations_list
+    ListView:
+        id: locations_list
+        adapter:
+            ListAdapter(
+            data=[],
+            cls=main.LocationButton,
+            args_converter=main.locations_args_converter)
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: None
+        height: "40dp"
+        Button:
+            text: "Add Location"
+            on_press: app.root.show_add_location_form()
+
 <CurrentWeather>:
     orientation: "vertical"
+    on_right_to_left_line: app.root.show_forecast(root.location)
+    on_bottom_to_top_line: root.update_weather()
     BoxLayout:
         Label:
             text: "{} ({})".format(root.location[0], root.location[1])
@@ -53,7 +73,7 @@ WeatherRoot:
         orientation: "horizontal"
         Label:
             text: root.conditions
-        AsyvImage:
+        AsyncImage:
             source: root.conditions_image
     BoxLayout:
         orientation: "horizontal"
@@ -79,3 +99,47 @@ WeatherRoot:
     size_hint_y: None
     on_press: app.root.show_current_weather(self.location)
 
+<ForecastLabel@BoxLayout>:
+    date: ""
+    conditions_image: ""
+    temp_min: None
+    temp_max: None
+    canvas.before:
+        Color:
+            rgb: [0.2,0.2, 0.2]
+        Line:
+            points:[self.pos[0], self.pos[1], self.width, self.pos[1]]
+    Label:
+        text: root.date
+    BoxLayout:
+        orientation: "vertical"
+        AsyncImage:
+            source: root.conditions_image
+        Label:
+            text: root.conditions
+    BoxLayout:
+        orientation: "vertical"
+        Label:
+            text: "Low: {}".format(root.temp_min)
+        Label:
+            text: "High: {}".format(root.temp_max)
+
+<Forecast>:
+    forecast_container: forecast_container
+    orientation: "vertical"
+    on_left_to_right_line: app.root.show_current_weather(root.location)
+    on_bottom_to_top_line: root.update_weather()
+    Label:
+        size_hint_y" 0.1
+        font_size: "30dp"
+        text: "{} ({})".format(root.location[0], root.location[1])
+    BoxLayout:
+        orientation: "vertical"
+        id: forecast_container
+    BoxLayout:
+        orientation: "horizontal"
+        size_hint_y: None
+        height: "40dp"
+        Button:
+            text: "Current"
+            on_press: app.root.show_current_weather(root.location)
