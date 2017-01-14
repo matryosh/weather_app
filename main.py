@@ -12,6 +12,11 @@ from kivy.storage.jsonstore import JsonStore
 from kivy.uix.modalview import ModalView
 from kivy.clock import Clock
 
+from plyer import gps
+from kivy.clock import Clock, mainthread
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+
 appidkey = "978031dbd4ea52dc90c8dfc5502d536b"
 
 def locations_args_converter(index, data_item):
@@ -39,6 +44,25 @@ class AddLocationForm(ModalView):
         del self.search_results.adapter.data[:]
         self.search_results.adapter.data.extend(cities)
         self.search_results._trigger_reset_populate()
+
+    def current_location(self):
+        try:
+            gps.configure(on_location=self.on_location)
+            gps.start()
+        except:
+            popup =Popup(title="GPS Error",
+            content=Label(text="GPS support is not implemented on your platform")
+            ).open()
+            Clock.schedule_once(lambda d: popup.dismiss, 3)
+
+    @mainthread
+    def on_location(self, **kwargs):
+        search_template = "http://api.openweathermap.org/data/2.5"
+        + "weather?lat={}&lon={}&APPID={}"
+        search_url = search_template.format(kwargs['lat'], kwargs['lon'], appidkey)
+        data = requests.get(search_url).json()
+        location = (data['sys']['country'],data['name'])
+        WeatherApp.get_running_app().root.show_current_weather(location)
 
 
 class CurrentWeather(BoxLayout):
@@ -156,6 +180,9 @@ class WeatherApp(App):
                 self.root.forecast.update_weather()
             except AttributeError:
                 pass
+
+    def on_pause(self):
+        return True
 
 if __name__ == '__main__':
 	WeatherApp().run()
